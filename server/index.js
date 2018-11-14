@@ -20,5 +20,5 @@ if (!isDev) {
 }
 
 app.listen(3001, () => {
-  console.log("server is listen: http://127.0.0.1:3001");
+  console.log('server is listen: http://127.0.0.1:3001');
 });
