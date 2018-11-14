@@ -1,7 +1,7 @@
 const axios = require('axios');
 const path = require('path');
 const webpack = require('webpack');
-const memoryFs = require('memory-fs');
+const MemoryFs = require('memory-fs');
 const proxy = require('http-proxy-middleware');
 const reactDomServer = require('react-dom/server');
 
@@ -16,7 +16,7 @@ const getTemplate = () => {
 }
 
 const Module = module.constructor;
-const mfs = new memoryFs();
+const mfs = new MemoryFs();
 const serverCompiler = webpack(serverConfig);
 
 serverCompiler.outputFileSystem = mfs;
@@ -24,8 +24,8 @@ let serverBundle;
 serverCompiler.watch({}, (err, status) => {
   if (err) throw err;
   status = status.toJson();
-  status.errors.forEach(err => {console.error(err)});
-  status.warnings.forEach(warn => {console.error(warn)});
+  status.errors.forEach(err => { console.error(err) });
+  status.warnings.forEach(warn => { console.error(warn) });
 
   const bundlePath = path.join(
     serverConfig.output.path,
@@ -37,11 +37,11 @@ serverCompiler.watch({}, (err, status) => {
   serverBundle = m.exports.default;
 })
 
-module.exports = function(app) {
+module.exports = function (app) {
   app.use('/public', proxy({
     target: 'http://127.0.0.1:3000'
   }));
-  app.get("*", (req, res) => {
+  app.get('*', (req, res) => {
     getTemplate().then(template => {
       res.send(template.replace('<!-- app -->', reactDomServer.renderToString(serverBundle)));
     })

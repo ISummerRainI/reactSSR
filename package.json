@@ -9,7 +9,7 @@
     "clear": "rimraf dist",
     "build": "npm run clear && npm run build:client && npm run build:server",
     "dev:client": "cross-env NODE_ENV=development webpack-dev-server --config build/webpack.config.client.js",
-    "dev:server": "cross-env NODE_ENV=development node server/index.js",
+    "dev:server": "nodemon server/index.js",
     "lint": "eslint --ext .js --ext .jsx client/",
     "precommit": "npm run lint"
   },
@@ -24,6 +24,7 @@
     "koa-static-router": "^1.2.0",
     "react": "^16.6.1",
     "react-dom": "^16.6.1",
+    "serve-favicon": "^2.5.0",
     "webpack": "^4.25.1"
   },
   "devDependencies": {
@@ -45,9 +46,11 @@
     "eslint-plugin-standard": "^4.0.0",
     "html-webpack-plugin": "^3.2.0",
     "husky": "^1.1.4",
+    "nodemon": "^1.18.6",
     "react-hot-loader": "^4.3.12",
     "rimraf": "^2.6.2",
     "webpack-cli": "^3.1.2",
-    "webpack-dev-server": "^3.1.10"
+    "webpack-dev-server": "^3.1.10",
+    "webpack-merge": "^4.1.4"
   }
 }
