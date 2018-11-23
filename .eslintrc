@@ -6,7 +6,8 @@
     "node": true
   },
   "rules": {
-    "semi": [0]
+    "semi": [0],
+    "no-console": [0]
   },
   "parserOptions": {
     "ecmaVersion": 6,

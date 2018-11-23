@@ -11,6 +11,13 @@
     "import/no-extraneous-dependencies": [0],
     "global-require": [1],
     "react/jsx-filename-extension": ["error", { "extensions": [".js", ".jsx"] }],
+    "import/no-unresolved": [0],
+    "arrow-body-style": [0],
+    "react/prop-types": [0],
+    "no-unused-vars": [0],
+    "react/destructuring-assignment": [0],
+    "no-underscore-dangle": [0],
+    "no-console": [0],
     "comma-dangle": [
       "error",
       {

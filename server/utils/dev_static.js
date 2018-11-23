@@ -3,19 +3,32 @@ const path = require('path');
 const webpack = require('webpack');
 const MemoryFs = require('memory-fs');
 const proxy = require('http-proxy-middleware');
-const reactDomServer = require('react-dom/server');
+const serverRender = require('./server_render');
 
 const serverConfig = require('../../build/webpack.config.server');
 
 const getTemplate = () => {
   return new Promise((resolve, reject) => {
-    axios.get('http://127.0.0.1:3000/public/index.html').then(res => {
+    axios.get('http://127.0.0.1:3000/public/server.ejs').then(res => {
       resolve(res.data);
     }).catch(reject);
   })
 }
 
-const Module = module.constructor;
+const NativeModule = require('module');
+const vm = require('vm');
+const getModuleFromString = (bundle, filename) => {
+  const m = { exports: {} };
+  const wrapper = NativeModule.wrap(bundle);
+  const script = new vm.Script(wrapper, {
+    filename: filename,
+    displayErrors: true
+  });
+  const result = script.runInThisContext();
+  result.call(m.exports, m.exports, require, m);
+  return m;
+}
+
 const mfs = new MemoryFs();
 const serverCompiler = webpack(serverConfig);
 
@@ -32,18 +45,20 @@ serverCompiler.watch({}, (err, status) => {
     serverConfig.output.filename
   );
   const bundle = mfs.readFileSync(bundlePath, 'utf8');
-  const m = new Module();
-  m._compile(bundle, 'server_entry.js');
-  serverBundle = m.exports.default;
+  const m = getModuleFromString(bundle, 'server_entry.js')
+  serverBundle = m.exports;
 })
 
 module.exports = function (app) {
   app.use('/public', proxy({
     target: 'http://127.0.0.1:3000'
   }));
-  app.get('*', (req, res) => {
+  app.get('*', (req, res, next) => {
+    if (!serverBundle) {
+      return res.send('wating for compile, refresh later');
+    }
     getTemplate().then(template => {
-      res.send(template.replace('<!-- app -->', reactDomServer.renderToString(serverBundle)));
-    })
+      return serverRender(serverBundle, template, req, res);
+    }).catch(next)
   });
 }
